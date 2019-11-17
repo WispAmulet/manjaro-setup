@@ -180,6 +180,11 @@
 
 9. Timeshift
 
+   ```sh
+   # timeshift 用来备份系统
+   yay timeshift
+   ```
+
 ## i3wm
 
 1. 常用快捷键
@@ -198,39 +203,40 @@
    mod+9
    # 退出以及其它功能
    mod+0
-   # 关闭当前窗口
+   # 关闭当前焦点
    mod+shift+q
    # 切换工作区中的焦点
    mod+方向键或j,k,l,;
-   # 切换工作区中焦点的位置
+   # 移动工作区中的焦点
    mod+shift+方向键或j,k,l,;
    # 切换工作区
-   mod+ctrl+方向键
-   # 移动当前窗口到某工作区
+   mod+ctrl+方向键左右
+   # 移动焦点到某工作区
    mod+shift+1-8
-   # 移动当前整个工作区到某工作区
+   # 发送焦点到某工作区
    mod+ctrl+1-8
    # 返回之前的工作区，重复按就是在两个工作区来回切换
    mod+b
-   # 移动当前窗口到之前的工作区
+   # 移动焦点窗口到之前的工作区
    mod+shift+b
    # 默认打开的新窗口在水平方向，可以通过以下命令切换
    mod+h # 水平
    mod+v # 垂直
    mod+q # 在水平方向和垂直方向循环切换，窗口边框会有高亮提示（大概 1-2px 宽的白边吧 233）
 
-   # 切换窗口为平铺模式（默认）
+   # 切换为平铺模式（默认）
    mod+e
-   # 切换窗口为 tab 模式（类似浏览器）
+   # 切换为 tab 模式（类似浏览器）
    mod+w
-   # 切换窗口为堆叠模式（类似 Windows，但每个窗口都是最大化的）
+   # 切换为堆叠模式（类似 Windows，但每个窗口都是最大化的）
    mod+s
 
    # 切换当前焦点为浮动模式（类似 Windows，但窗口位于桌面正中，不占满屏幕）
-   # mod+鼠标拖动
    mod+shift+space
    # 在普通模式的窗口和浮动模式的窗口之前切换
    mod+space
+   # 移动浮动的窗口
+   mod+鼠标拖动
 
    # 显示窗口边框为 1px（默认）
    mod+y
@@ -239,9 +245,9 @@
    # 显示窗口边框为普通（类似窗口显示标题栏，tab 模式和堆叠模式会强制显示，且不能切换）
    mod+n
 
-   # 打开默认浏览器
+   # 打开浏览器 Palemoon
    mod+f2
-   # 打开默认资源管理器，默认为 pamanfm
+   # 打开资源管理器 Pamanfm
    mod+f3
 
    # 打开 dMenu（桌面顶部一个提示输入和运行命令行的工具）
@@ -283,7 +289,48 @@
 
    # 3. 设置打开 Chrome 的快捷键
    bindsym $mod+c exec google-chrome-stable
+
+   # 4. 多显示器时移动工作区到下一个显示器
+   # Move workspace between screens
+   bindsym $mod+p move workspace to output right
    ```
+
+3. i3status 上显示网速
+
+   ```sh
+   # 创建新文件夹
+   mkdir ~/.config/i3status
+   # 复制 i3status 配置文件到新文件夹
+   cp /etc/i3status.conf ~/.config/i3status/config
+   # ~/.config/i3status/config
+   general {
+       # ...
+       output_format = i3bar # 添加这一行
+   }
+   # 复制 net-speed.sh 到本地
+   # https://github.com/i3/i3status/tree/master/contrib
+   touch ~/.config/i3status/net-speed.sh
+   chmod +x net-speed.sh
+   # ~/.i3/config
+   bar {
+     # status_command i3status
+     status_command exec ~/.config/i3status/net-speed.sh # 添加这一行
+   }
+   # 重启 i3
+   # mod+shift+r
+   ```
+
+4. 设定显示器布局
+
+   ~~系统自带了 xrandr 可以设定显示器输出布局，可以在 App 里通过 GUI 设定，然后保存方案，但是每次重启都需要手动加载方案~~
+
+   ~~因此推荐保存在 i3 的配置文件中
+   please set your primary output first. Example: 'xrandr --output eDP1 --primary'
+   xrandr --output eDP1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output DP1 --off --output HDMI1 --mode 1920x1080 --pos 1920x0 --rotate normal --output VIRTUAL1 --off~~
+
+5. 设定背景图片
+
+   系统自带了 `nitrogen` 可以修改背景图片
 
 ## Terminal
 
