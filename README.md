@@ -105,17 +105,17 @@
    启动 ibus
 
    ```sh
-   # 手动启动
+   # 手动启动 ibus 配置程序
    ibus-setup
    ```
 
-   修改配置文件 `~/.xprofile`，添加
+   修改文件 `~/.xprofile`，添加
 
    ```sh
    export GTK_IM_MODULE=ibus
    export XMODIFIERS=@im=ibus
    export QT_IM_MODULE=ibus
-   # 自动启动 ibus 进程
+   # 启动 ibus 进程
    ibus-daemon -d -x
    ```
 
@@ -125,16 +125,34 @@
    source ~/.xprofile
    ```
 
-   在 ibus 配置中添加 rime 输入法。切换到该输入法，以下是部分配置方法
+   在 ibus 配置中添加 rime 输入法。rime 输入法默认为繁体，按 F4 选择输入方式（快捷键可修改）
 
-   1. rime 输入法默认是繁体字，打字时 ctrl+` 切换输入方式
-   2. 在 `~/.config/ibus/rime` 文件夹新建 `default-custom.yaml` 文件
+   rime 输入法的默认配置文件会保存在 `~/.config/ibus/rime/build` 文件夹中。如果要修改配置，在 `~/.config/ibus/rime` 文件夹内创建对应的文件。
 
-      ```yaml
-      patch:
-        # 每页选词数量
-        'menu/page_size': 7
-      ```
+   > [wiki](https://github.com/rime/home/wiki/CustomizationGuide)
+
+   如默认的配置文件叫 `default.yaml`，创建文件的名字即为 `default.custom.yaml`
+
+   ```yaml
+   # ~/.config/ibus/rime/default.custom.yaml
+   patch:
+     'menu/page_size': 7 # 每页选词数量
+     'ascii_composer/good_old_caps_lock': true
+     'ascii_composer/switch_key':
+       Caps_Lock: clear
+       # Control_L: noop
+       Control_L: inline_ascii # 修改 ctrl 键为中英文切换
+       Control_R: noop
+       Eisu_toggle: clear
+       # Shift_L: inline_ascii
+       Shift_L: noop
+       # Shift_R: commit_text
+       Shift_R: noop
+
+   # ~/.config/ibus/rime/luna_pinyin_simp.custom.yaml
+   patch:
+     "switches/@0/reset": 1 # 切换到该输入模式时，默认为英文
+   ```
 
 6. 修改默认浏览器
 
@@ -273,26 +291,28 @@
    **_Upgrade-2019-11-15:_**
 
    1. 重装之后 dmenu 可以使用，无需修改
-   2. `bindsym $mod+x exec st` 为 Simple Terminal 设置快捷键
 
    ```sh
-   # 1. dmenu 无法打开
-   #### 默认设置无效，但可以通过 cli 中输入 `dmenu_run` 启动（如果 cli 也无法启动，应该是 locale 设置不对）
+   # 1. 默认设置无效，但可以通过 cli 中输入 `dmenu_run` 启动（如果 cli 也无法启动，应该是 locale 设置不对）
    bindsym $mod+d exec --no-startup-id dmenu_recency
    # =>
    bindsym $mod+d exec --no-startup-id dmenu_run
 
-   # 2. 修改默认打开的 terminal
-   bindsym $mod+Return exec terminal
-   # =>
+   # Start Applications
+   bindsym $mod+c exec google
    bindsym $mod+Return exec st
 
-   # 3. 设置打开 Chrome 的快捷键
-   bindsym $mod+c exec google-chrome-stable
-
-   # 4. 多显示器时移动工作区到下一个显示器
    # Move workspace between screens
    bindsym $mod+p move workspace to output right
+
+   # Open applications on specific workspaces
+   # use `xprop | grep CLASS` command in terminal, your mouse pointer changes into a crosshair,
+   # click on the program to get classname
+   # eg. WM_CLASS(STRING) = "google-chrome", "Google-chrome"
+   assign [class="google-chrome"] $ws2
+   assign [class="code"] $ws3
+   assign [class="Pcmanfm"] $ws4
+   assign [class="shadowsocks-qt5"] $ws8
    ```
 
 3. i3status 上显示网速
@@ -334,19 +354,13 @@
 
 ## Terminal
 
-1. 安装 Simple Terminal
-
-   ```sh
-   sudo pacman -S st-manjaro
-   ```
-
-2. 安装 oh-my-zsh （系统自带了 zsh）
+1. 安装 oh-my-zsh （系统自带了 zsh）
 
    ```sh
    sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
    ```
 
-3. 设置 zsh，配置文件在 `~/.zshrc`
+2. zsh 配置 `~/.zshrc`
 
    ```sh
    ZSH_THEME="agnoster"
@@ -357,10 +371,11 @@
       vscode
       ng
       web-search
-      # z
-      # command-time
-      # zsh-autosuggestions
-      # zsh-syntax-highlighting
+      z
+      # custom plugin
+      command-time
+      zsh-autosuggestions
+      zsh-syntax-highlighting # 放在最后
    )
 
    ### Add aliases in `~/.bash_aliases` to zsh
@@ -373,12 +388,12 @@
    source /usr/share/nvm/init-nvm.sh
 
    ### command-time plugin config
-   # ZSH_COMMAND_TIME_MIN_SECONDS=3
-   # ZSH_COMMAND_TIME_MSG="Took: %s"
-   # ZSH_COMMAND_TIME_COLOR="cyan"
+   ZSH_COMMAND_TIME_MIN_SECONDS=3
+   ZSH_COMMAND_TIME_MSG="Took: %s"
+   ZSH_COMMAND_TIME_COLOR="cyan"
    ```
 
-4. 为了显示 zsh 某些主题，需要安装 Powerline fonts
+3. 为了显示 zsh 某些主题，需要安装 Powerline fonts
 
    ```sh
    # clone
@@ -390,6 +405,39 @@
    cd ..
    rm -rf fonts
    ```
+
+4. 修改 urxvt 字体大小
+
+   ```sh
+   # ~/.Xresources
+   URxvt.font: xft:FiraCodeRetina:pixelsize=16
+   ```
+
+   ```sh
+   xrdb -merge ~/.Xresources
+   ```
+
+## Simple Terminal
+
+1. 安装
+
+   ```sh
+   # ~/workspace
+   git clone git://git.suckless.org/st
+   # cd st
+   make clean install
+   ```
+
+2. 配置
+
+   ```sh
+   # 编辑 `config.def.h` 文件
+   make clean install
+   ```
+
+## Tmux
+
+TODO
 
 ## Code
 
@@ -423,6 +471,10 @@
    # 安装 lts 版本的 node 以及对应版本的 npm
    nvm install --lts
    ```
+
+## NeoVim
+
+TODO
 
 ## SSR
 
